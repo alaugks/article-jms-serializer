@@ -8,23 +8,23 @@ https://dev.to/elevado/create-a-custom-jms-serializer-handler-for-mapping-values
 
 ### Start docker image
 ```bash
-docker compose -f docker-compose.yml up --build -d
+docker compose up -d
 ```
 
 ### Run composer install
 ```bash
-docker exec attribute_article composer install
+docker exec article_jms_serializer composer install
 ```
 
 ### Run tests
 ```bash
-docker exec attribute_article bin/phpunit
+docker exec article_jms_serializer bin/phpunit
 ```
 
 ### Open bash
 
 ```bash
-docker exec -it attribute_article bash
+docker exec -it article_jms_serializer bash
 ```
 
 ## Frontend
