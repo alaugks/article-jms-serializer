@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Tests\Functional;
+namespace App\Tests;
 
 use App\Dto\ContactDto;
 use App\Service\CrmSerializerService;

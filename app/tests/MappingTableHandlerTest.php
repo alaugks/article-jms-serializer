@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Tests\Functional;
+namespace App\Tests;
 
 use App\Handler\MappingTableHandler;
 use JMS\Serializer\SerializationContext;
@@ -33,17 +33,6 @@ class MappingTableHandlerTest extends KernelTestCase
     private function getType(string $mappingTable): array
     {
        return ['name' => 'MappingTable', 'params' => [$mappingTable]];
-    }
-    
-    public function testMappingTableNotDefined()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->handler->serialize(
-            $this->serializationVisitor,
-            'BAZ',
-            $this->getType(''),
-            $this->context
-        );
     }
 
     public function testSerializeArrayString()

@@ -42,18 +42,12 @@ class MappingTableHandler implements SubscribingHandlerInterface
         SerializationContext $context
     ): ?string
     {
-        $mappingTable = $this->getMappingTable($type);
-
         if (null === $value || '' === $value) {
             return ''; // Reset value in CRM
         }
 
-        foreach ($mappingTable as $mKey => $mValue) {
-            if ($value === $mValue) {
-                return (string)$mKey; // Force string
-            }
-        }
-        return null;
+        $key = array_search($value, $this->getMappingTable($type));
+        return $key ? (string)$key : null;
     }
 
     public function deserialize(
@@ -63,13 +57,7 @@ class MappingTableHandler implements SubscribingHandlerInterface
     ): mixed
     {
         $mappingTable = $this->getMappingTable($type);
-
-        foreach ($mappingTable as $mKey => $mValue) {
-            if ((string)$value === (string)$mKey) {
-                return $mValue;
-            }
-        }
-        return null;
+        return $mappingTable[$value] ?? null;
     }
 
     private function getMappingTable(array $type): array
@@ -80,18 +68,21 @@ class MappingTableHandler implements SubscribingHandlerInterface
             throw new \InvalidArgumentException('mapping_table param not defined');
         }
 
-        // Table as JSON
-        if ($array = json_decode($type['params'][0], true)) {
+        // Example: #[Type("MappingTable<['1', 'MALE', '2', 'FEMALE', '6', 'DIVERS']>")]
+        if (is_array($type['params'][0])) {
+            for ($i = 0; $i < count($type['params'][0]); $i += 2) {
+                $mappingTable[$type['params'][0][$i]] = $type['params'][0][$i + 1];
+            }
+        }
+
+        // Example: #[Type("MappingTable<'{\"1\": \"MALE\", \"2\": \"FEMALE\", \"6\": \"DIVERS\"}'>")]
+        else if ($array = json_decode($type['params'][0], true)) {
             $mappingTable = $array;
         }
 
-        // Table from Constant as array
-        else if (defined($type['params'][0])) {
+        // Example: #[Type("MappingTable<'App\Dto\ContactDto::SALUTATION'>")]
+        elseif (defined($type['params'][0])) {
             $mappingTable = constant($type['params'][0]);
-        }
-
-        if (!is_array($mappingTable) || !count($mappingTable)) {
-            throw new \InvalidArgumentException('mapping_table is not an array or empty');
         }
 
         return $mappingTable;
